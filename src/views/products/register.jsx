@@ -1,5 +1,7 @@
 import React from 'react'
 
+import ProductService from '../../app/productService'
+
 class RegisterProduct extends React.Component {
 
     state = {
@@ -7,8 +9,16 @@ class RegisterProduct extends React.Component {
         sku: '',
         description: '',
         price: 0,
-        supplier: ''
+        supplier: '',
+        success: false,
+        error: []
 
+    }
+
+    constructor() {
+        super()
+
+        this.service = new ProductService();
     }
 
     onChange = e => {
@@ -18,7 +28,25 @@ class RegisterProduct extends React.Component {
     }
 
     onSubmit = e => {
-        console.log(this.state)
+        const product = {
+            name: this.state.name,
+            sku: this.state.sku,
+            description: this.state.description,
+            price: this.state.price,
+            supplier: this.state.supplier
+        }
+
+        try {
+
+            this.service.save(product)
+            this.onClear()
+            this.setState({success: true})
+            
+        } catch (error) {
+            const errors = error.error
+            this.setState({errors: error})
+        }
+
     }
 
     onClear = () => {
@@ -39,6 +67,25 @@ class RegisterProduct extends React.Component {
                     Cadastro de Produto
                 </div>
                 <div className="card-body">
+
+                    {
+                        this.state.success &&
+                            <div className="alert alert-dismissible alert-success">
+                                <button type="button" className="close" data-dismiss="alert">&times;</button>
+                                <strong>Parabéns!</strong> Cadastro realizado com sucesso!
+                            </div>
+                    }
+
+                    {
+                        this.state.error.length > 0 &&
+
+                    this.state.error.map(msg => {
+                                    return <div className="alert alert-dismissible alert-danger">
+                                    <button type="button" className="close" data-dismiss="alert">&times;</button>
+                                    <strong>Ocorreu um erro!</strong> {msg}
+                                            </div>
+                                })
+                    }
                     
                     <div className="row">
 
